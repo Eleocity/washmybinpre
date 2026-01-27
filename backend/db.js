@@ -18,11 +18,11 @@ function getPool() {
           queueLimit: 0,
         }
       : {
-          host: process.env.MYSQLHOST || "127.0.0.1",
+          host: process.env.MYSQLHOST || "mysql.railway.internal",
           port: Number(process.env.MYSQLPORT || 3306),
           user: process.env.MYSQLUSER || "root",
-          password: process.env.MYSQLPASSWORD || "",
-          database: process.env.MYSQLDATABASE || "washmybin",
+          password: process.env.MYSQLPASSWORD || "WashMyBinPre",
+          database: process.env.MYSQLDATABASE || "washmybinpre",
           waitForConnections: true,
           connectionLimit: 10,
           queueLimit: 0,
