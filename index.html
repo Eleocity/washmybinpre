@@ -466,42 +466,63 @@
         history.replaceState(null, "", id);
       });
     });
-
+  
     // Set footer year
     document.getElementById("year").textContent = new Date().getFullYear();
-
-    // Fake "submit" (no backend yet)
+  
     const form = document.getElementById("waitlistForm");
     const toast = document.getElementById("toast");
-
+  
     function showToast(msg){
       toast.textContent = msg;
       toast.style.display = "block";
       clearTimeout(showToast._t);
       showToast._t = setTimeout(() => toast.style.display = "none", 2600);
     }
-
+  
+    // ✅ SET THIS to your backend API base (or "" if same domain)
+    const API_BASE = "https://backend.washmybinwi.com";
+  
+    // ✅ SET THIS to your real backend route
+    const ENDPOINT = `${API_BASE}/api/waitlist`;
+  
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-
-      // Basic validation
+  
       const data = Object.fromEntries(new FormData(form).entries());
-      if (!data.name || !data.phone || !data.zip) {
+  
+      // matches your required fields in the HTML form
+      if (!data.name || !data.phone || !data.zip || !data.plan_interest) {
         showToast("Please fill required fields.");
         return;
       }
-
-      // TODO: Replace this with a real POST to your backend or form service
-      // await fetch("/api/waitlist", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(data) });
-
-      // For now: store in localStorage so you can see it working
-      const key = "washmybin_waitlist";
-      const arr = JSON.parse(localStorage.getItem(key) || "[]");
-      arr.push({ ...data, createdAt: new Date().toISOString() });
-      localStorage.setItem(key, JSON.stringify(arr));
-
-      form.reset();
-      showToast("Added to waitlist ✅");
+  
+      try {
+        const res = await fetch(ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: String(data.name || "").trim(),
+            zip: String(data.zip || "").trim(),
+            phone: String(data.phone || "").trim(),
+            email: String(data.email || "").trim(),
+            plan_interest: String(data.plan_interest || "").trim(),
+            source: "landing"
+          })
+        });
+  
+        const json = await res.json().catch(() => ({}));
+  
+        if (!res.ok || !json.ok) {
+          showToast(json.error || "Submit failed. Try again.");
+          return;
+        }
+  
+        form.reset();
+        showToast(json.already ? "You're already on the list ✅" : "Added to waitlist ✅");
+      } catch (err) {
+        showToast("Network error (API unreachable).");
+      }
     });
   </script>
 </body>
