@@ -1,5 +1,4 @@
-// db.js — MySQL version (JS, not TS)
-
+// db.js — MySQL (JS / ESM) for Railway
 import mysql from "mysql2/promise";
 
 let pool = null;
@@ -7,42 +6,51 @@ let pool = null;
 function getPool() {
   if (pool) return pool;
 
-  pool = mysql.createPool(
-    url
-      ? {
-          uri: url,
-          waitForConnections: true,
-          connectionLimit: 10,
-          queueLimit: 0,
-        }
-      : {
-          host: process.env.MYSQLHOST || "mysql.railway.internal",
-          port: Number(process.env.MYSQLPORT || 3306),
-          user: process.env.MYSQLUSER || "root",
-          password: process.env.MYSQLPASSWORD || "WashMyBinPre",
-          database: process.env.MYSQLDATABASE || "washmybinpre",
-          waitForConnections: true,
-          connectionLimit: 10,
-          queueLimit: 0,
-        }
-  );
+  const databaseUrl = process.env.DATABASE_URL || "mysql://root:WashMyBinPre@mysql.railway.internal:3306/"; // <-- define it!
+
+  if (databaseUrl) {
+    pool = mysql.createPool({
+      uri: databaseUrl,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    });
+    return pool;
+  }
+
+  // Split vars fallback
+  const host = process.env.MYSQLHOST;
+  const port = Number(process.env.MYSQLPORT || 3306);
+  const user = process.env.MYSQLUSER;
+  const password = process.env.MYSQLPASSWORD;
+  const database = process.env.MYSQLDATABASE;
+
+  // Fail loud if missing
+  if (!host || !user || !password || !database) {
+    throw new Error(
+      `Missing MySQL env vars. Got host=${host}, user=${user}, db=${database}. ` +
+        `Set DATABASE_URL or MYSQLHOST/MYSQLUSER/MYSQLPASSWORD/MYSQLDATABASE (and MYSQLPORT).`
+    );
+  }
+
+  pool = mysql.createPool({
+    host,
+    port,
+    user,
+    password,
+    database,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+  });
 
   return pool;
 }
 
-console.log("DB using", {
-    hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
-    host: process.env.MYSQLHOST,
-    port: process.env.MYSQLPORT,
-    user: process.env.MYSQLUSER,
-    db: process.env.MYSQLDATABASE,
-  });
-  
-
 export async function initDb() {
-  const pool = getPool();
+  const p = getPool();
 
-  await pool.execute(`
+  await p.execute(`
     CREATE TABLE IF NOT EXISTS waitlist (
       id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
       name VARCHAR(255) NOT NULL,
@@ -58,22 +66,21 @@ export async function initDb() {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `);
 
+  // create indexes (safe if already exist by checking info_schema)
   const ensureIndex = async (indexName, ddl) => {
-    const dbName = process.env.MYSQLDATABASE || null;
-
-    const [rows] = await pool.query(
+    const [rows] = await p.query(
       `
       SELECT COUNT(1) AS count
       FROM information_schema.STATISTICS
-      WHERE TABLE_SCHEMA = COALESCE(?, DATABASE())
+      WHERE TABLE_SCHEMA = DATABASE()
         AND TABLE_NAME = 'waitlist'
         AND INDEX_NAME = ?
       `,
-      [dbName, indexName]
+      [indexName]
     );
 
     if (!rows[0] || rows[0].count === 0) {
-      await pool.execute(ddl);
+      await p.execute(ddl);
     }
   };
 
@@ -81,16 +88,13 @@ export async function initDb() {
     "idx_waitlist_created_at",
     `CREATE INDEX idx_waitlist_created_at ON waitlist (created_at);`
   );
-  await ensureIndex(
-    "idx_waitlist_zip",
-    `CREATE INDEX idx_waitlist_zip ON waitlist (zip);`
-  );
+  await ensureIndex("idx_waitlist_zip", `CREATE INDEX idx_waitlist_zip ON waitlist (zip);`);
   await ensureIndex(
     "idx_waitlist_phone",
     `CREATE INDEX idx_waitlist_phone ON waitlist (phone);`
   );
 
-  return pool;
+  return p;
 }
 
 export function db() {
