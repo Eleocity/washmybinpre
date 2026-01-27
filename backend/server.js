@@ -14,30 +14,36 @@ const PORT = Number(process.env.PORT || 3000);
 
 // Comma-separated list of allowed origins, e.g.
 // ALLOWED_ORIGINS=https://washmybinwi.com,https://www.washmybinwi.com,http://localhost:5173
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "http://localhost:5173,https://www.backend.washmybinwi.com,https://backend.washmybinwi.com")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
 
-// ---- Middleware ----
-app.use(helmet());
-app.use(express.json({ limit: "1mb" }));
+// Lock down by default: if ALLOWED_ORIGINS is empty in production, block.
+const isProd = process.env.NODE_ENV === "production";
 
 app.use(
   cors({
     origin: (origin, cb) => {
-      // allow server-to-server / curl / same-origin (no Origin header)
+      // Allow server-to-server calls (no Origin header), e.g. curl/postman
       if (!origin) return cb(null, true);
 
-      // if you didn't set ALLOWED_ORIGINS, allow all (dev-friendly)
-      if (ALLOWED_ORIGINS.length === 0) return cb(null, true);
+      // In dev, if you forgot to set ALLOWED_ORIGINS, allow all to avoid pain
+      if (!isProd && ALLOWED_ORIGINS.length === 0) return cb(null, true);
 
       if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-      return cb(new Error("Not allowed by CORS"));
+
+      // Block anything else
+      return cb(new Error(`CORS blocked: ${origin}`));
     },
-    credentials: true,
+    credentials: false, // set true ONLY if you use cookies/sessions
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "X-Admin-Token"],
   })
 );
+
+// Good practice: explicitly handle preflight
+app.options("*", cors());
 
 app.use(
   rateLimit({
