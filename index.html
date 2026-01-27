@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WashMyBin — Trash Can Cleaning</title>
+  <link rel="icon" type="image/x-icon" href="imag/fav.png">
+  <meta name="description" content="WashMyBin — professional trash can cleaning. Launching soon. Join the waitlist for early access and launch discounts." />
+  <style>
+    :root{
+      --bg:#061420;
+      --card:#0b2133;
+      --card2:#0f2c44;
+      --text:#eaf3fb;
+      --muted:#b7c8d6;
+      --brand:#2fd08f;
+      --brand2:#2aa3ff;
+      --line:rgba(255,255,255,.10);
+      --shadow: 0 18px 45px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 15% 10%, rgba(42,163,255,.25), transparent 55%),
+        radial-gradient(900px 500px at 85% 0%, rgba(47,208,143,.22), transparent 55%),
+        linear-gradient(180deg, #061420 0%, #04101a 100%);
+      overflow-x:hidden;
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:1100px; margin:0 auto; padding:22px 18px 70px}
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px;
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius: 999px;
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+    }
+    .brand{
+      display:flex; gap:10px; align-items:center;
+      font-weight:800; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background:
+        linear-gradient(135deg, rgba(47,208,143,1), rgba(42,163,255,1));
+      box-shadow: 0 10px 22px rgba(0,0,0,.25);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:7px 8px 9px 8px;
+      border-radius:8px;
+      border:2px solid rgba(255,255,255,.75);
+      opacity:.8;
+    }
+    .navlinks{display:flex; gap:14px; align-items:center}
+    .navlinks a{
+      color:var(--muted);
+      font-weight:600;
+      font-size:14px;
+      padding:10px 12px;
+      border-radius:999px;
+      transition:.2s ease;
+    }
+    .navlinks a:hover{color:var(--text); background:rgba(255,255,255,.05)}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding:12px 14px;
+      border-radius:999px;
+      font-weight:800;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+      transition: transform .15s ease, background .2s ease, border-color .2s ease;
+      cursor:pointer;
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.18)}
+    .btn.primary{
+      border: none;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      color:#04101a;
+    }
+    .btn.primary:hover{transform: translateY(-2px)}
+    .hero{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:22px;
+      margin-top:18px;
+      align-items:stretch;
+    }
+    @media (max-width: 900px){
+      .hero{grid-template-columns: 1fr}
+      .navlinks{display:none}
+    }
+    .card{
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero-left{padding:28px}
+    .pillrow{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px}
+    .pill{
+      font-size:13px;
+      font-weight:800;
+      color: rgba(255,255,255,.85);
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+    }
+    .pill strong{color:#04101a; background: linear-gradient(135deg, var(--brand), var(--brand2)); padding:2px 8px; border-radius:999px; margin-right:6px}
+    h1{
+      margin: 0 0 10px;
+      font-size: 46px;
+      line-height: 1.03;
+      letter-spacing: -0.8px;
+    }
+    @media (max-width: 520px){
+      h1{font-size: 38px}
+    }
+    .sub{
+      margin:0 0 18px;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.6;
+      max-width: 58ch;
+    }
+    .cta-row{display:flex; gap:12px; flex-wrap:wrap; margin: 18px 0 10px}
+    .fine{color:rgba(183,200,214,.95); font-size:13px; line-height:1.5}
+    .hero-right{padding:18px}
+    .panel{
+      padding:18px;
+      border-radius: 16px;
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(15,44,68,.75), rgba(11,33,51,.65));
+    }
+    .panel h3{margin:0 0 6px; font-size:16px}
+    .panel p{margin:0 0 14px; color:var(--muted); font-size:14px; line-height:1.6}
+    form{display:grid; gap:10px}
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media (max-width: 520px){ .grid2{grid-template-columns:1fr} }
+    input, select, textarea{
+      width:100%;
+      padding:12px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      outline:none;
+    }
+    input::placeholder, textarea::placeholder{color:rgba(183,200,214,.75)}
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(47,208,143,.7);
+      box-shadow: 0 0 0 4px rgba(47,208,143,.12);
+    }
+    .sections{margin-top:22px; display:grid; gap:18px}
+    .section{padding:22px}
+    .section h2{margin:0 0 10px; font-size:22px}
+    .muted{color:var(--muted); line-height:1.7; margin:0}
+    .features{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+    }
+    @media (max-width: 900px){ .features{grid-template-columns:1fr} }
+    .feat{
+      padding:14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      display:flex; gap:12px;
+    }
+    .icon{
+      width:36px; height:36px; border-radius: 12px;
+      background: rgba(47,208,143,.12);
+      border:1px solid rgba(47,208,143,.22);
+      display:grid; place-items:center;
+      flex:0 0 auto;
+    }
+    .feat h4{margin:0 0 4px; font-size:15px}
+    .feat p{margin:0; color:var(--muted); font-size:13px; line-height:1.55}
+    .pricing{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+      align-items:stretch;
+    }
+    @media (max-width: 900px){ .pricing{grid-template-columns:1fr} }
+    .price{
+      padding:16px;
+      border-radius: 16px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:12px; font-weight:900; letter-spacing:.2px;
+      padding:7px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      width: fit-content;
+    }
+    .amount{font-size:28px; font-weight:900; letter-spacing:-.4px}
+    .per{font-size:13px; color:var(--muted); font-weight:700}
+    .list{margin:0; padding-left:16px; color:var(--muted); line-height:1.7; font-size:14px}
+    .faq{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 900px){ .faq{grid-template-columns:1fr} }
+    details{
+      border-radius:16px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      padding:14px;
+    }
+    summary{cursor:pointer; font-weight:800}
+    details p{color:var(--muted); margin:10px 0 0; line-height:1.6}
+    footer{
+      margin-top:18px;
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      color:rgba(183,200,214,.8);
+      font-size:13px;
+      padding: 0 6px;
+    }
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      padding: 12px 14px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+      color: var(--text);
+      font-weight: 800;
+      display:none;
+      z-index: 50;
+    }
+    .smalllink{color:rgba(183,200,214,.9); text-decoration:underline; text-decoration-color: rgba(183,200,214,.35)}
+  </style>
+</head>
+
+<body>
+  <div class="wrap" id="top">
+    <header class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>WashMyBin</div>
+      </div>
+      <nav class="navlinks" aria-label="Site">
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <a href="#waitlist">Waitlist</a>
+      </nav>
+      <a class="btn primary" href="#waitlist">Join Waitlist</a>
+    </header>
+
+    <main class="hero">
+      <section class="card hero-left">
+        <div class="pillrow">
+          <div class="pill"><strong>Launching</strong> in about a month</div>
+          <div class="pill">Odor • Grime • Germs</div>
+          <div class="pill">Text reminders</div>
+        </div>
+
+        <h1>Fresh cans. Zero hassle.</h1>
+        <p class="sub">
+          WashMyBin provides professional trash & recycling bin cleaning right at your curb.
+          Join the waitlist now to get early access scheduling and a launch discount.
+        </p>
+
+        <div class="cta-row">
+          <a class="btn primary" href="#waitlist">Get early access</a>
+          <a class="btn" href="#pricing">See pricing</a>
+          <a class="btn" href="#how">How it works</a>
+        </div>
+
+        <p class="fine">
+          ✅ Fast curbside service • ✅ Clean, deodorize & sanitize • ✅ Perfect for homes & small businesses
+        </p>
+      </section>
+
+      <aside class="card hero-right" id="waitlist">
+        <div class="panel">
+          <h3>Join the Waitlist</h3>
+          <p>We’ll text/email you when booking opens. (No spam.)</p>
+
+          <!--
+            This form is currently "static" (no backend).
+            Options:
+            1) Netlify: add netlify attribute + deploy on Netlify
+            2) Formspree: set action="https://formspree.io/f/xxxxxx"
+            3) Your backend: point action to your endpoint
+          -->
+          <form id="waitlistForm" method="post">
+            <div class="grid2">
+              <input name="name" placeholder="Name" autocomplete="name" required />
+              <input name="zip" placeholder="ZIP Code" inputmode="numeric" autocomplete="postal-code" required />
+            </div>
+            <input name="phone" placeholder="Mobile (for texts)" inputmode="tel" autocomplete="tel" required />
+            <input name="email" placeholder="Email (optional)" type="email" autocomplete="email" />
+            <select name="plan_interest" required>
+              <option value="" disabled selected>Interested in…</option>
+              <option>One-time cleaning</option>
+              <option>Bi-weekly plan</option>
+              <option>Monthly plan</option>
+              <option>Not sure yet</option>
+            </select>
+            <button class="btn primary" type="submit">Notify me at launch</button>
+            <div class="fine">
+              By submitting, you agree to receive launch updates. You can opt out anytime.
+            </div>
+          </form>
+        </div>
+      </aside>
+    </main>
+
+    <div class="sections">
+      <section class="card section" id="how">
+        <h2>How it works</h2>
+        <p class="muted">Simple curbside service — you leave the cans out, we handle the messy part.</p>
+
+        <div class="features">
+          <div class="feat">
+            <div class="icon" aria-hidden="true">🗓️</div>
+            <div>
+              <h4>Book (or subscribe)</h4>
+              <p>One-time or recurring bi-weekly/monthly cleanings.</p>
+            </div>
+          </div>
+          <div class="feat">
+            <div class="icon" aria-hidden="true">🚿</div>
+            <div>
+              <h4>We clean, sanitize, deodorize</h4>
+              <p>High-pressure wash + disinfecting to reduce odor and grime.</p>
+            </div>
+          </div>
+          <div class="feat">
+            <div class="icon" aria-hidden="true">✅</div>
+            <div>
+              <h4>You enjoy fresh bins</h4>
+              <p>Quick curbside turnaround — no scrubbing, no smell.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section" id="pricing">
+        <h2>Simple pricing</h2>
+        <p class="muted">Transparent rates. No surprises. (You can adjust these anytime.)</p>
+
+        <div class="pricing">
+          <div class="price">
+            <div class="tag">One-time • Single can</div>
+            <div class="amount">$25 <span class="per">per visit</span></div>
+            <ul class="list">
+              <li>Clean + sanitize + deodorize</li>
+              <li>Great for seasonal deep clean</li>
+              <li>No commitment</li>
+            </ul>
+            <a class="btn" href="#waitlist">Join waitlist</a>
+          </div>
+
+          <div class="price">
+            <div class="tag">One-time • Pair</div>
+            <div class="amount">$45 <span class="per">per visit</span></div>
+            <ul class="list">
+              <li>Trash + recycling</li>
+              <li>Same-day curbside service</li>
+              <li>Best value for most homes</li>
+            </ul>
+            <a class="btn" href="#waitlist">Join waitlist</a>
+          </div>
+
+          <div class="price">
+            <div class="tag">Subscriptions</div>
+            <div class="amount">$20 / $40 <span class="per">bi-weekly or monthly</span></div>
+            <ul class="list">
+              <li>$20 single can</li>
+              <li>$40 pair of cans</li>
+              <li>Recurring reminders + priority routing</li>
+            </ul>
+            <a class="btn primary" href="#waitlist">Get early access</a>
+          </div>
+        </div>
+
+        <p class="fine" style="margin-top:12px">
+          Want custom pricing for HOA/condos/small businesses? Add a note in the waitlist form.
+        </p>
+      </section>
+
+      <section class="card section" id="faq">
+        <h2>FAQ</h2>
+        <p class="muted">Common questions we get before launch.</p>
+
+        <div class="faq">
+          <details>
+            <summary>Do I need to be home?</summary>
+            <p>No. Leave the cans at the curb on your service day and we’ll take care of the rest.</p>
+          </details>
+          <details>
+            <summary>What if my cans aren’t out?</summary>
+            <p>We’ll send reminders. If cans aren’t accessible, we’ll reschedule (policies can be added later).</p>
+          </details>
+          <details>
+            <summary>Will you clean inside only or outside too?</summary>
+            <p>We focus on the interior where odors build up, but we also rinse the exterior for a clean finish.</p>
+          </details>
+          <details>
+            <summary>How do I know if you service my area?</summary>
+            <p>Join the waitlist with your ZIP — we’ll confirm service availability when booking opens.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="card section" id="contact">
+        <h2>Contact</h2>
+        <p class="muted">
+          Have questions before launch? Email us at
+          <a class="smalllink" href="mailto:hello@washmybin.com">hello@washmybin.com</a>
+          (change this to your real email).
+        </p>
+      </section>
+
+      <footer>
+        <div>© <span id="year"></span> WashMyBin</div>
+        <div>
+          <a class="smalllink" href="#top">Back to top</a>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Added to waitlist ✅</div>
+
+  <script>
+    // Smooth anchor scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener("click", (e) => {
+        const id = a.getAttribute("href");
+        const el = document.querySelector(id);
+        if (!el) return;
+        e.preventDefault();
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.replaceState(null, "", id);
+      });
+    });
+
+    // Set footer year
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Fake "submit" (no backend yet)
+    const form = document.getElementById("waitlistForm");
+    const toast = document.getElementById("toast");
+
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.style.display = "block";
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.style.display = "none", 2600);
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // Basic validation
+      const data = Object.fromEntries(new FormData(form).entries());
+      if (!data.name || !data.phone || !data.zip) {
+        showToast("Please fill required fields.");
+        return;
+      }
+
+      // TODO: Replace this with a real POST to your backend or form service
+      // await fetch("/api/waitlist", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(data) });
+
+      // For now: store in localStorage so you can see it working
+      const key = "washmybin_waitlist";
+      const arr = JSON.parse(localStorage.getItem(key) || "[]");
+      arr.push({ ...data, createdAt: new Date().toISOString() });
+      localStorage.setItem(key, JSON.stringify(arr));
+
+      form.reset();
+      showToast("Added to waitlist ✅");
+    });
+  </script>
+</body>
+</html>
