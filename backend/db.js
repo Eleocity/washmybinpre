@@ -32,6 +32,15 @@ function getPool() {
   return pool;
 }
 
+console.log("DB using", {
+    hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
+    host: process.env.MYSQLHOST,
+    port: process.env.MYSQLPORT,
+    user: process.env.MYSQLUSER,
+    db: process.env.MYSQLDATABASE,
+  });
+  
+
 export async function initDb() {
   const pool = getPool();
 
