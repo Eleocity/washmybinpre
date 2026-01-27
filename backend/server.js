@@ -45,6 +45,11 @@ app.use(
 // Good practice: explicitly handle preflight
 app.options("*", cors());
 
+// Railway runs behind a reverse proxy
+app.set("trust proxy", 1);
+
+
+
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
