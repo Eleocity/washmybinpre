@@ -10,6 +10,11 @@ import { initDb, db } from "./db.js";
 
 const app = express();
 
+// ✅ BODY PARSERS (THIS IS THE FIX)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
 const PORT = Number(process.env.PORT || 3000);
 
 // Comma-separated list of allowed origins, e.g.
