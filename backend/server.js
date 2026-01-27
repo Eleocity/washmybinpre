@@ -148,7 +148,7 @@ app.post("/api/waitlist", async (req, res) => {
     res.json({ ok: true, id: result.insertId });
   } catch (e) {
     console.error("POST /api/waitlist error:", e);
-    res.status(500).json({ ok: false, error: "server_error" });
+    res.status(500).json({ ok: false, error: "Duplicate Entry" });
   }
 });
 
