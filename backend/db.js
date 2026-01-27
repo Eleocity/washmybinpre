@@ -6,7 +6,7 @@ let pool = null;
 function getPool() {
   if (pool) return pool;
 
-  const databaseUrl = process.env.DATABASE_URL || "mysql://root:WashMyBinPre@mysql.railway.internal:3306/"; // <-- define it!
+  const databaseUrl = process.env.DATABASE_URL || "mysql://root:pBjfyRvkqbAEmCgJBGcVIYGDvzqDhLnt@mysql.railway.internal:3306/railway"; // <-- define it!
 
   if (databaseUrl) {
     pool = mysql.createPool({
