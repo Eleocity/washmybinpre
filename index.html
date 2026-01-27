@@ -487,43 +487,23 @@
     const ENDPOINT = `${API_BASE}/api/waitlist`;
   
     form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-  
-      const data = Object.fromEntries(new FormData(form).entries());
-  
-      // matches your required fields in the HTML form
-      if (!data.name || !data.phone || !data.zip || !data.plan_interest) {
-        showToast("Please fill required fields.");
-        return;
-      }
-  
-      try {
-        const res = await fetch(ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: String(data.name || "").trim(),
-            zip: String(data.zip || "").trim(),
-            phone: String(data.phone || "").trim(),
-            email: String(data.email || "").trim(),
-            plan_interest: String(data.plan_interest || "").trim(),
-            source: "landing"
-          })
-        });
-  
-        const json = await res.json().catch(() => ({}));
-  
-        if (!res.ok || !json.ok) {
-          showToast(json.error || "Submit failed. Try again.");
-          return;
-        }
-  
-        form.reset();
-        showToast(json.already ? "You're already on the list ✅" : "Added to waitlist ✅");
-      } catch (err) {
-        showToast("Network error (API unreachable).");
-      }
-    });
+  e.preventDefault();
+
+  const fd = new FormData(form);
+
+  const res = await fetch(ENDPOINT, {
+    method: "POST",
+    body: fd,            // ✅ send form-data
+    // ✅ DO NOT set Content-Type manually when using FormData
+  });
+
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || !json.ok) return showToast(json.error || "Submit failed.");
+
+  form.reset();
+  showToast(json.already ? "You're already on the list ✅" : "Added to waitlist ✅");
+});
+
   </script>
 </body>
 </html>
