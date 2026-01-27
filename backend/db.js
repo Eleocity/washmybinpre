@@ -7,8 +7,6 @@ let pool = null;
 function getPool() {
   if (pool) return pool;
 
-  const url = process.env.DATABASE_URL;
-
   pool = mysql.createPool(
     url
       ? {
