@@ -313,7 +313,7 @@
             2) Formspree: set action="https://formspree.io/f/xxxxxx"
             3) Your backend: point action to your endpoint
           -->
-          <form id="waitlistForm" method="post">
+          <form id="waitlistForm" action="https://backend.washmybinwi.com/api/waitlist" method="post">
             <div class="grid2">
               <input name="name" placeholder="Name" autocomplete="name" required />
               <input name="zip" placeholder="ZIP Code" inputmode="numeric" autocomplete="postal-code" required />
@@ -455,8 +455,8 @@
   <div class="toast" id="toast">Added to waitlist ✅</div>
 
   <script>
-    // Smooth anchor scroll
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
+    // ===== Smooth anchor scroll =====
+    document.querySelectorAll('a[href^="#"]').forEach((a) => {
       a.addEventListener("click", (e) => {
         const id = a.getAttribute("href");
         const el = document.querySelector(id);
@@ -467,43 +467,123 @@
       });
     });
   
-    // Set footer year
-    document.getElementById("year").textContent = new Date().getFullYear();
+    // ===== Footer year =====
+    const yearEl = document.getElementById("year");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
   
-    const form = document.getElementById("waitlistForm");
+    // ===== Toast =====
     const toast = document.getElementById("toast");
-  
-    function showToast(msg){
+    function showToast(msg) {
+      if (!toast) return;
       toast.textContent = msg;
       toast.style.display = "block";
       clearTimeout(showToast._t);
-      showToast._t = setTimeout(() => toast.style.display = "none", 2600);
+      showToast._t = setTimeout(() => (toast.style.display = "none"), 2600);
     }
   
-    // ✅ SET THIS to your backend API base (or "" if same domain)
-    const API_BASE = "https://backend.washmybinwi.com";
+    // ===== Waitlist submit =====
+    const form = document.getElementById("waitlistForm");
+    const ENDPOINT = "https://backend.washmybinwi.com/api/waitlist";
   
-    // ✅ SET THIS to your real backend route
-    const ENDPOINT = `${API_BASE}/api/waitlist`;
+    function buildPayload(formEl) {
+      const data = Object.fromEntries(new FormData(formEl).entries());
+      const name = String(data.name || "").trim();
+      const zip = String(data.zip || "").trim();
+      const phone = String(data.phone || "").trim();
+      const email = String(data.email || "").trim();
+      const plan_interest = String(data.plan_interest || "").trim();
   
-    form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const fd = new FormData(form);
-
-  const res = await fetch(ENDPOINT, {
-    method: "POST",
-    body: fd,            // ✅ send form-data
-    // ✅ DO NOT set Content-Type manually when using FormData
-  });
-
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok || !json.ok) return showToast(json.error || "Submit failed.");
-
-  form.reset();
-  showToast(json.already ? "You're already on the list ✅" : "Added to waitlist ✅");
-});
-
+      if (!name || !zip || !phone || !plan_interest) {
+        return { error: "Please fill all required fields." };
+      }
+  
+      // send a few common aliases (harmless if backend ignores)
+      return {
+        name,
+        full_name: name,
+        zip,
+        zipcode: zip,
+        phone,
+        email,
+        plan_interest,
+        plan: plan_interest,
+        source: "landing",
+      };
+    }
+  
+    async function readJsonSafe(res) {
+      const text = await res.text();
+      let json = null;
+      try { json = JSON.parse(text); } catch {}
+      return { text, json };
+    }
+  
+    async function tryUrlEncoded(payload) {
+      const body = new URLSearchParams(payload).toString();
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body,
+      });
+      const { text, json } = await readJsonSafe(res);
+      console.log("[urlencoded] status:", res.status, "body:", text);
+      return { res, json, text };
+    }
+  
+    async function tryJson(payload) {
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const { text, json } = await readJsonSafe(res);
+      console.log("[json] status:", res.status, "body:", text);
+      return { res, json, text };
+    }
+  
+    if (form) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+  
+        const payload = buildPayload(form);
+        if (payload.error) return showToast(payload.error);
+  
+        const btn = form.querySelector('button[type="submit"], button:not([type])');
+        const old = btn ? btn.textContent : "";
+        if (btn) { btn.disabled = true; btn.textContent = "Submitting..."; }
+  
+        try {
+          // 1) urlencoded
+          let out = await tryUrlEncoded(payload);
+          if (out.res.ok && out.json && out.json.ok) {
+            form.reset();
+            showToast(out.json.already ? "You're already on the list ✅" : "Added to waitlist ✅");
+            return;
+          }
+  
+          // 2) json
+          out = await tryJson(payload);
+          if (out.res.ok && out.json && out.json.ok) {
+            form.reset();
+            showToast(out.json.already ? "You're already on the list ✅" : "Added to waitlist ✅");
+            return;
+          }
+  
+          // If still failing, show the backend’s error (this is the key)
+          const backendErr =
+            (out.json && (out.json.error || out.json.message)) ||
+            "Submit failed (check console for response body).";
+          showToast(backendErr);
+        } catch (err) {
+          console.error("Fetch failed:", err);
+          showToast("Network error (fetch failed).");
+        } finally {
+          if (btn) { btn.disabled = false; btn.textContent = old || "Notify me at launch"; }
+        }
+      });
+    }
   </script>
+  
+  
 </body>
 </html>
