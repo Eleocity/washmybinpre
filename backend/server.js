@@ -19,7 +19,7 @@ const PORT = Number(process.env.PORT || 3000);
 
 // Comma-separated list of allowed origins, e.g.
 // ALLOWED_ORIGINS=https://washmybinwi.com,https://www.washmybinwi.com,http://localhost:5173
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "http://localhost:5173,https://www.backend.washmybinwi.com,https://backend.washmybinwi.com")
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "http://localhost:5173,https://www.backend.washmybinwi.com,https://backend.washmybinwi.com,https://washmybinwi.com,https://www.washmybinwi.com")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
